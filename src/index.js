@@ -16,28 +16,6 @@ function isAnInteger(value) {
     return true;
 }
 
-function parseJson(string) {
-    const formattedString = string.replace(/[{}"]/g, '').replace(/\s/g, '');
-    const chunks = formattedString.split(',')
-
-    var body = {};
-
-    chunks.forEach((chunk) => {
-        const [key, value] = chunk.split(':');
-
-        if (key == 'valor') {
-            if (value.includes('.')) return body[key] = parseFloat(value).toFixed(1);
-            return body[key] = parseInt(value);
-        }
-
-        if (value == 'null' || value == 'undefined') return body[key] = null;
-
-        return body[key] = value;
-    })
-
-    return body;
-}
-
 const server = http.createServer((req, res) => {
     const { method, url } = req;
     let body = [];
@@ -62,7 +40,7 @@ const server = http.createServer((req, res) => {
 
 async function handlePostClientes(req, res, body) {
     const clienteId = parseInt(req.url.split('/')[2]);
-    const { valor, tipo, descricao } = parseJson(body);
+    const { valor, tipo, descricao } = JSON.parse(body);
 
     if (isNaN(clienteId) || !valor || isNaN(valor) || !isAnInteger(valor) || !tipo || (tipo != 'c' && tipo != 'd') || !descricao || !isNaN(descricao) || descricao.length > 10) {
         res.writeHead(422, { 'Content-Type': 'text/plain' });
